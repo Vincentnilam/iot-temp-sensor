@@ -5,6 +5,11 @@ const prisma = require('../prisma');
 
 // receive data from raspberry pi
 router.post("/", async (req, res) => {
+  const apiKey = req.headers["x-api-key"];
+  if (apiKey !== process.env.PI_SECRET) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
   const { temperature, humidity } = req.body;
   if (typeof temperature !== "number" || typeof humidity !== "number") {
     return res.status(400).json({ error: "Invalid data format"});
