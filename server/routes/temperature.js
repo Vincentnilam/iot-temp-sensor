@@ -40,18 +40,32 @@ router.get("/latest", async (req, res) => {
   }
 });
 
-// get initial 100 first, I'll think of React side later prolly, maybe month to month basis?
 router.get("/", async (req, res) => {
   try {
-    const readings = await prisma.temperatureReading.findMany({
-      orderBy: { createdAt: "desc"},
-      take: 100,
+    const page = Math.max(1, parseInt(req.query.page) || 1);
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit) || 20));
+    const skip = (page - 1) * limit;
+
+    const [readings, total] = await Promise.all([
+      prisma.temperatureReading.findMany({
+        orderBy: { createdAt: "desc" },
+        take: limit,
+        skip,
+      }),
+      prisma.temperatureReading.count(),
+    ]);
+
+    res.json({
+      data: readings,
+      page,
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
     });
-    res.json(readings);
   } catch (err) {
-    res.status(500).json({ error: "Failed to fetch temps."});
+    res.status(500).json({ error: "Failed to fetch temps." });
   }
-})
+});
 
 
 module.exports = router;
