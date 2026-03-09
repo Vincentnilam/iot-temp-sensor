@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import StatCard from './components/StatCard'
 import TempHumidityChart from './components/TempHumidityChart'
 
+const API_BASE = `${import.meta.env.VITE_API_URL || ''}/api/temperature`
+
 export default function App() {
   const [latest, setLatest] = useState(null)
   const [history, setHistory] = useState([])
@@ -17,8 +19,8 @@ export default function App() {
   async function fetchData() {
     try {
       const [latestRes, historyRes] = await Promise.all([
-        fetch('/api/temperature/latest'),
-        fetch('/api/temperature?limit=50'),
+        fetch(`${API_BASE}/latest`),
+        fetch(`${API_BASE}?limit=50`),
       ])
       const latestData = await latestRes.json()
       const historyData = await historyRes.json()
