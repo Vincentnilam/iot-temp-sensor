@@ -9,13 +9,13 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
 model TemperatureReading {
-  id              Int     @id @default(autoincrement())
-  temperature     Float
-  humidity        Float
-  createdAt       DateTime @default(now())
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  temperature Float
+  humidity    Float
+  createdAt   DateTime @default(now())
 }
